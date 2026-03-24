@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PeopleSoft Customer Discoverer v2.0 | Mythics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #0077ff;
+    --gold: #f0b429;
+    --text: #e8edf5;
+    --muted: #6b7fa3;
+    --success: #00e5a0;
+    --error: #ff4d6d;
+    --purple: #a78bfa;
+    --warn: #f0b429;
+    --mono: 'DM Mono', monospace;
+    --display: 'Playfair Display', serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Top bar */
+  .topbar {
+    position: relative;
+    z-index: 10;
+    background: rgba(10,14,26,0.97);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(8px);
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 20px; }
+
+  .mythics-logo img { height: 28px; display: block; }
+
+  .topbar-divider { width: 1px; height: 28px; background: var(--border); }
+
+  .topbar-tool {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .oracle-pill {
+    background: rgba(199,70,52,0.1);
+    border: 1px solid rgba(199,70,52,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #e87060;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .version-pill {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .topbar-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .topbar-link:hover { color: var(--accent); }
+
+  /* Main */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header { margin-bottom: 40px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .initiative-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.85;
+  }
+
+  .initiative-tag::before {
+    content: '◆';
+    font-size: 7px;
+    color: var(--gold);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(34px, 5vw, 60px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  /* Config */
+  .config-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+
+  label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+  }
+
+  input::placeholder { color: var(--muted); }
+
+  .run-btn {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border: none;
+    border-radius: 8px;
+    padding: 11px 26px;
+    color: #000;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .run-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,212,255,0.3); }
+  .run-btn:active { transform: translateY(0); }
+  .run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Keywords section */
+  .kw-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .kw-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .kw-section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .keywords-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .kw-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    background: rgba(0,119,255,0.08);
+    border: 1px solid rgba(0,119,255,0.18);
+    color: #6aa3ff;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .kw-tag:hover, .kw-tag.active {
+    background: rgba(0,119,255,0.22);
+    border-color: rgba(0,119,255,0.45);
+    color: #fff;
+  }
+
+  .kw-tag .remove-kw {
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .kw-tag .remove-kw:hover { opacity: 1; color: var(--error); }
+
+  /* Add keyword input */
+  .add-kw-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .add-kw-input {
+    flex: 1;
+    max-width: 280px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .add-kw-btn {
+    background: rgba(0,119,255,0.12);
+    border: 1px solid rgba(0,119,255,0.25);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: #6aa3ff;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .add-kw-btn:hover { background: rgba(0,119,255,0.22); color: #fff; border-color: rgba(0,119,255,0.45); }
+
+  /* Confidence filter */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  .confidence-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+  }
+
+  .confidence-btn.active-all  { border-color: rgba(0,212,255,0.4);  color: var(--accent);  background: rgba(0,212,255,0.08); }
+  .confidence-btn.active-high { border-color: rgba(0,229,160,0.4);  color: var(--success); background: rgba(0,229,160,0.08); }
+  .confidence-btn.active-med  { border-color: rgba(240,180,41,0.4); color: var(--gold);    background: rgba(240,180,41,0.08); }
+  .confidence-btn.active-low  { border-color: rgba(255,77,109,0.4); color: var(--error);   background: rgba(255,77,109,0.08); }
+
+  /* Status */
+  .status-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 18px;
+    margin-bottom: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .status-dot.running { background: var(--gold); animation: pulse 1s ease-in-out infinite; }
+  .status-dot.success { background: var(--success); }
+  .status-dot.error   { background: var(--error); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* Stats */
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 130px;
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-value.high  { color: var(--success); }
+  .stat-value.med   { color: var(--gold); }
+  .stat-value.low   { color: var(--error); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Toolbar */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+
+  .toolbar-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+
+  .tool-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .tool-btn.zoominfo {
+    background: rgba(0,119,255,0.08);
+    border-color: rgba(0,119,255,0.25);
+    color: #6aa3ff;
+    font-weight: 500;
+  }
+
+  .tool-btn.zoominfo:hover { background: rgba(0,119,255,0.18); border-color: rgba(0,119,255,0.5); color: #fff; }
+
+  /* Notices */
+  .notice {
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-bottom: 24px;
+    display: none;
+    line-height: 1.6;
+  }
+
+  .notice.success { background: rgba(0,229,160,0.05); border: 1px solid rgba(0,229,160,0.15); color: var(--success); }
+  .notice.info    { background: rgba(0,119,255,0.06); border: 1px solid rgba(0,119,255,0.2);  color: #6aa3ff; }
+  .notice.warn    { background: rgba(240,180,41,0.06); border: 1px solid rgba(240,180,41,0.2); color: var(--gold); }
+
+  /* Results grid */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .company-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+    animation: cardIn 0.4s ease forwards;
+    opacity: 0;
+    transform: translateY(12px);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .company-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .company-card.conf-high::before { background: linear-gradient(90deg, var(--success), #00d4ff); }
+  .company-card.conf-med::before  { background: linear-gradient(90deg, var(--gold), #ffd166); }
+  .company-card.conf-low::before  { background: linear-gradient(90deg, var(--error), #ff8fa3); }
+
+  .company-card:hover { border-color: rgba(0,212,255,0.25); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .company-card:hover::before { opacity: 1; }
+
+  @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+
+  .company-name {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    flex: 1;
+  }
+
+  .card-badges { display: flex; gap: 5px; flex-shrink: 0; flex-direction: column; align-items: flex-end; }
+
+  .role-count {
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 20px;
+    padding: 3px 9px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .conf-badge {
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .conf-badge.high { background: rgba(0,229,160,0.12); border: 1px solid rgba(0,229,160,0.25); color: var(--success); }
+  .conf-badge.med  { background: rgba(240,180,41,0.12); border: 1px solid rgba(240,180,41,0.25); color: var(--gold); }
+  .conf-badge.low  { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.25); color: var(--error); }
+
+  .job-title { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .conf-warning {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--warn);
+    background: rgba(240,180,41,0.06);
+    border: 1px solid rgba(240,180,41,0.15);
+    border-radius: 4px;
+    padding: 5px 9px;
+    line-height: 1.5;
+  }
+
+  .toggle-titles {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: left;
+    margin-top: -4px;
+  }
+
+  .toggle-titles:hover { color: var(--accent); }
+
+  .all-titles { display: none; flex-direction: column; gap: 3px; }
+  .all-titles.open { display: flex; }
+
+  .all-titles-item {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 4px;
+    border-left: 2px solid var(--border);
+  }
+
+  .card-meta { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .tag-loc      { background: rgba(0,212,255,0.08);  color: var(--accent); border: 1px solid rgba(0,212,255,0.15); }
+  .tag-cat      { background: rgba(167,139,250,0.08); color: var(--purple); border: 1px solid rgba(167,139,250,0.15); }
+  .tag-contract { background: rgba(0,229,160,0.08);  color: var(--success); border: 1px solid rgba(0,229,160,0.15); }
+  .tag-date     { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+
+  .view-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+    margin-top: 2px;
+  }
+
+  .view-link:hover { color: var(--accent); }
+
+  /* Empty */
+  .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); grid-column: 1 / -1; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+  .empty-title { font-family: var(--display); font-size: 24px; color: var(--muted); margin-bottom: 8px; }
+  .empty-sub { font-size: 14px; font-family: var(--mono); }
+
+  /* Footer */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-left { display: flex; align-items: center; gap: 14px; }
+  .footer-logo img { height: 20px; opacity: 0.7; }
+  .footer-text { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .footer-text a { color: var(--accent); text-decoration: none; }
+  .footer-right { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+
+  .modal-title { font-family: var(--display); font-size: 22px; font-weight: 700; color: var(--text); }
+
+  .zi-badge {
+    background: rgba(0,119,255,0.12);
+    border: 1px solid rgba(0,119,255,0.3);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #6aa3ff;
+    letter-spacing: 0.05em;
+  }
+
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+  .modal-steps {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-step { display: flex; gap: 12px; align-items: flex-start; }
+
+  .step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #000;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text { font-family: var(--mono); font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .step-text strong { color: var(--text); }
+
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-download {
+    background: linear-gradient(135deg, #0055cc, #0099ff);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,153,255,0.3); }
+
+  @media (max-width: 768px) {
+    .config-panel { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
+    .wrapper { padding: 28px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="mythics-logo" href="https://mythics.com" target="_blank">
+      <img src="https://mythics.com/wp-content/themes/mythics-1887/assets/img/logo-white.png" alt="Mythics" />
+    </a>
+    <div class="topbar-divider"></div>
+    <span class="topbar-tool">Market Intelligence Tool</span>
+  </div>
+  <div class="topbar-right">
+    <span class="version-pill">v2.0</span>
+    <span class="oracle-pill">#1 Oracle Partner</span>
+    <a class="topbar-link" href="https://mythics.com" target="_blank">mythics.com</a>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <header>
+    <div class="eyebrow">Market Intelligence Tool</div>
+    <div class="initiative-tag">Component of the PeopleSoft Attack Plan — Growth Initiative</div>
+    <h1>PeopleSoft<br><span>Customer Discoverer</span></h1>
+    <p class="subtitle">Discover which companies in your chosen search location are actively using PeopleSoft by scanning live job postings across major job boards.</p>
+  </header>
+
+  <!-- Config -->
+  <div class="config-panel">
+    <div class="field-group">
+      <label>Adzuna App ID</label>
+      <input type="text" id="appId" placeholder="Your app_id" />
+    </div>
+    <div class="field-group">
+      <label>Adzuna App Key</label>
+      <input type="password" id="appKey" placeholder="Your app_key" />
+    </div>
+    <div class="field-group">
+      <label>Search Location</label>
+      <input type="text" id="location" value="Atlanta, GA" />
+    </div>
+    <button class="run-btn" id="runBtn" onclick="runScan()">▶ Run Scan</button>
+  </div>
+
+  <!-- Keywords section -->
+  <div class="kw-section">
+    <div class="kw-section-header">
+      <span class="kw-section-label">Keywords to search — click to toggle</span>
+    </div>
+    <div class="keywords-row" id="kwRow">
+      <span class="kw-tag active" data-kw="peoplesoft">PeopleSoft <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag active" data-kw="PS HCM">PS HCM <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag active" data-kw="PeopleSoft Financials">PS Financials <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag active" data-kw="PeopleCode">PeopleCode <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag active" data-kw="PeopleSoft FSCM">PS FSCM <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag" data-kw="Oracle PeopleSoft">Oracle PeopleSoft <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag" data-kw="PeopleSoft Campus">PS Campus Solutions <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+      <span class="kw-tag" data-kw="PeopleSoft Administrator">PS Administrator <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span></span>
+    </div>
+    <div class="add-kw-row">
+      <input class="add-kw-input" type="text" id="newKwInput" placeholder="Add custom keyword..." onkeydown="if(event.key==='Enter') addKeyword()" />
+      <button class="add-kw-btn" onclick="addKeyword()">+ Add Keyword</button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Enter your Adzuna credentials and click Run Scan to begin.</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Unique Companies</div></div>
+    <div class="stat"><div class="stat-value high" id="statHigh">0</div><div class="stat-label">High Confidence</div></div>
+    <div class="stat"><div class="stat-value med" id="statMed">0</div><div class="stat-label">Med Confidence</div></div>
+    <div class="stat"><div class="stat-value low" id="statLow">0</div><div class="stat-label">Low Confidence</div></div>
+    <div class="stat"><div class="stat-value" id="statJobs">0</div><div class="stat-label">Total Jobs</div></div>
+    <div class="stat"><div class="stat-value" id="statTime">—</div><div class="stat-label">Scan Time (sec)</div></div>
+  </div>
+
+  <!-- Confidence filter -->
+  <div class="filter-row" id="filterRow" style="display:none">
+    <span class="filter-label">Filter by confidence:</span>
+    <button class="confidence-btn active-all" onclick="filterByConf('all', this)">All Results</button>
+    <button class="confidence-btn" onclick="filterByConf('high', this)">✓ High — Likely PS owner</button>
+    <button class="confidence-btn" onclick="filterByConf('med', this)">~ Medium — Probably PS</button>
+    <button class="confidence-btn" onclick="filterByConf('low', this)">⚠ Low — May not own PS</button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar" style="display:none">
+    <button class="tool-btn zoominfo" onclick="showZoomInfoModal()">⬇ Export for ZoomInfo</button>
+    <button class="tool-btn" onclick="exportFullCSV()">⬇ Full CSV Export</button>
+    <button class="tool-btn" onclick="copyList()">⎘ Copy Company Names</button>
+    <div class="toolbar-sep"></div>
+    <button class="tool-btn" onclick="sortResults('alpha')">A→Z</button>
+    <button class="tool-btn" onclick="sortResults('jobs')">By Role Count</button>
+    <button class="tool-btn" onclick="sortResults('conf')">By Confidence</button>
+    <button class="tool-btn" onclick="sortResults('date')">By Date</button>
+  </div>
+
+  <!-- Notices -->
+  <div class="notice success" id="dedupNotice"></div>
+  <div class="notice warn" id="confNotice"></div>
+  <div class="notice info" id="ziTip">
+    💡 <strong>ZoomInfo tip:</strong> Click "Export for ZoomInfo" to download a CSV ready for ZoomInfo ListMatch — upload it to ZoomInfo → Lists → Upload Lists to instantly find contacts at each company.
+  </div>
+
+  <!-- Results -->
+  <div class="results-grid" id="resultsGrid">
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">Ready to discover</div>
+      <div class="empty-sub">Results will appear here after you run a scan</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="footer-logo">
+        <img src="https://mythics.com/wp-content/themes/mythics-1887/assets/img/logo-white.png" alt="Mythics" />
+      </div>
+      <div class="footer-text">
+        Mythics, LLC — Oracle's #1 Partner &nbsp;·&nbsp;
+        <a href="https://mythics.com" target="_blank">mythics.com</a>
+      </div>
+    </div>
+    <div class="footer-right">PeopleSoft Customer Discoverer v2.0 · Internal Sales Tool</div>
+  </div>
+</div>
+
+<!-- ZoomInfo Modal -->
+<div class="modal-overlay" id="ziModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Export for ZoomInfo</div>
+      <span class="zi-badge">ListMatch</span>
+    </div>
+    <p class="modal-sub">Downloads a CSV formatted for ZoomInfo's ListMatch feature so you can instantly find contacts at every company in your results.</p>
+    <div class="modal-steps">
+      <div class="modal-step"><div class="step-num">1</div><div class="step-text"><strong>Download</strong> the CSV from this export</div></div>
+      <div class="modal-step"><div class="step-num">2</div><div class="step-text">In ZoomInfo go to <strong>Lists → Upload Lists</strong></div></div>
+      <div class="modal-step"><div class="step-num">3</div><div class="step-text">Select <strong>Companies</strong> as list type, then <strong>ListMatch</strong></div></div>
+      <div class="modal-step"><div class="step-num">4</div><div class="step-text">Upload CSV — ZoomInfo auto-maps <strong>Company Name</strong> and <strong>Location</strong></div></div>
+      <div class="modal-step"><div class="step-num">5</div><div class="step-text">Once processed, click <strong>Open in Search</strong> to find contacts</div></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-download" onclick="exportZoomInfo()">⬇ Download ZoomInfo CSV</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Keyword management ────────────────────────────────────────────────────
+  document.querySelectorAll('.kw-tag').forEach(t => {
+    t.addEventListener('click', e => { if (!e.target.classList.contains('remove-kw')) t.classList.toggle('active'); });
+  });
+
+  function addKeyword() {
+    const input = document.getElementById('newKwInput');
+    const kw = input.value.trim();
+    if (!kw) return;
+    const row = document.getElementById('kwRow');
+    const tag = document.createElement('span');
+    tag.className = 'kw-tag active';
+    tag.dataset.kw = kw;
+    tag.innerHTML = `${kw} <span class="remove-kw" onclick="removeKw(this)" title="Remove">×</span>`;
+    tag.addEventListener('click', e => { if (!e.target.classList.contains('remove-kw')) tag.classList.toggle('active'); });
+    row.appendChild(tag);
+    input.value = '';
+    input.focus();
+  }
+
+  function removeKw(btn) {
+    btn.closest('.kw-tag').remove();
+  }
+
+  // ── Confidence scoring ────────────────────────────────────────────────────
+  const LOW_CONFIDENCE_PHRASES = [
+    'or equivalent', 'or workday', 'or sap', 'or oracle hcm', 'or successfactors',
+    'or ceridian', 'or adp', 'or dayforce', 'or ukg', 'or kronos',
+    'similar erp', 'similar system', 'equivalent system', 'any erp',
+    'comparable experience', 'related system', 'or similar'
+  ];
+
+  const HIGH_CONFIDENCE_PHRASES = [
+    'peoplesoft administrator', 'peoplesoft developer', 'peoplesoft analyst',
+    'peoplesoft consultant', 'peoplesoft hcm', 'peoplesoft financials',
+    'peoplesoft fscm', 'peoplecode', 'peoplesoft technical', 'peoplesoft functional',
+    'ps hcm', 'ps fscm', 'peoplesoft upgrade', 'peoplesoft implementation'
+  ];
+
+  function scoreConfidence(job) {
+    const title = (job.title || '').toLowerCase();
+    const desc  = (job.description || '').toLowerCase();
+    const full  = title + ' ' + desc;
+
+    // Check for low confidence signals in description
+    const lowSignal = LOW_CONFIDENCE_PHRASES.some(p => full.includes(p));
+    if (lowSignal) {
+      const lowPhrase = LOW_CONFIDENCE_PHRASES.find(p => full.includes(p));
+      return { level: 'low', reason: `Job mentions "${lowPhrase}" — company may not own PeopleSoft` };
+    }
+
+    // High confidence: keyword appears in job TITLE
+    const highSignal = HIGH_CONFIDENCE_PHRASES.some(p => title.includes(p));
+    if (highSignal) return { level: 'high', reason: 'PeopleSoft appears directly in the job title — strong ownership signal' };
+
+    // Medium: keyword in description only
+    return { level: 'med', reason: 'PeopleSoft mentioned in job description — likely owner but not confirmed by title' };
+  }
+
+  // ── Data ──────────────────────────────────────────────────────────────────
+  let allResults = [];
+  let companiesMap = {};
+  let currentFilter = 'all';
+
+  function setStatus(msg, state = '') {
+    document.getElementById('statusText').textContent = msg;
+    document.getElementById('statusDot').className = 'status-dot' + (state ? ' ' + state : '');
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function daysAgo(iso) {
+    if (!iso) return '';
+    const d = Math.floor((Date.now() - new Date(iso)) / 86400000);
+    return d === 0 ? 'Today' : d === 1 ? '1d ago' : `${d}d ago`;
+  }
+
+  async function fetchKeyword(appId, appKey, keyword, location) {
+    const url = `https://api.adzuna.com/v1/api/jobs/us/search/1?app_id=${appId}&app_key=${appKey}&results_per_page=50&what=${encodeURIComponent(keyword)}&where=${encodeURIComponent(location)}&sort_by=date&content-type=application/json`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return (await r.json()).results || [];
+  }
+
+  async function runScan() {
+    const appId    = document.getElementById('appId').value.trim();
+    const appKey   = document.getElementById('appKey').value.trim();
+    const location = document.getElementById('location').value.trim() || 'Atlanta, GA';
+    if (!appId || !appKey) { setStatus('Please enter your Adzuna App ID and App Key first.', 'error'); return; }
+
+    const kws = [...document.querySelectorAll('.kw-tag.active')].map(t => t.dataset.kw);
+    if (!kws.length) { setStatus('Please select at least one keyword.', 'error'); return; }
+
+    document.getElementById('runBtn').disabled = true;
+    ['statsBar','filterRow','toolbar','dedupNotice','confNotice','ziTip'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('resultsGrid').innerHTML = '';
+    companiesMap = {}; allResults = [];
+    let totalJobs = 0, dedupCount = 0;
+    const t0 = Date.now();
+    currentFilter = 'all';
+
+    for (let i = 0; i < kws.length; i++) {
+      const kw = kws[i];
+      setStatus(`Searching "${kw}"... (${i+1}/${kws.length})`, 'running');
+      try {
+        const jobs = await fetchKeyword(appId, appKey, kw, location);
+        totalJobs += jobs.length;
+        for (const job of jobs) {
+          const name = job?.company?.display_name?.trim();
+          if (!name) continue;
+          const key = name.toLowerCase();
+          const conf = scoreConfidence(job);
+
+          if (companiesMap[key]) {
+            companiesMap[key].jobCount++;
+            companiesMap[key].titles.push(job.title);
+            if (job.created > (companiesMap[key].latestDate || '')) companiesMap[key].latestDate = job.created;
+            // Upgrade confidence if a better signal found
+            const rank = { high: 3, med: 2, low: 1 };
+            if (rank[conf.level] > rank[companiesMap[key].confidence.level]) {
+              companiesMap[key].confidence = conf;
+            }
+            dedupCount++;
+          } else {
+            companiesMap[key] = {
+              name, title: job.title, titles: [job.title],
+              location: job?.location?.display_name || location,
+              category: job?.category?.label || null,
+              contractType: job.contract_time?.replace('_','-') || job.contract_type || null,
+              latestDate: job.created || null,
+              redirectUrl: job.redirect_url || null,
+              jobCount: 1, keyword: kw,
+              confidence: conf
+            };
+          }
+        }
+      } catch(e) { setStatus(`Error on "${kw}": ${e.message}`, 'error'); }
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    allResults = Object.values(companiesMap).sort((a,b) => {
+      const rank = { high: 3, med: 2, low: 1 };
+      return rank[b.confidence.level] - rank[a.confidence.level] || b.jobCount - a.jobCount;
+    });
+
+    const elapsed = ((Date.now()-t0)/1000).toFixed(1);
+    const highCount = allResults.filter(r=>r.confidence.level==='high').length;
+    const medCount  = allResults.filter(r=>r.confidence.level==='med').length;
+    const lowCount  = allResults.filter(r=>r.confidence.level==='low').length;
+
+    document.getElementById('statTotal').textContent    = allResults.length;
+    document.getElementById('statHigh').textContent     = highCount;
+    document.getElementById('statMed').textContent      = medCount;
+    document.getElementById('statLow').textContent      = lowCount;
+    document.getElementById('statJobs').textContent     = totalJobs;
+    document.getElementById('statTime').textContent     = elapsed;
+    document.getElementById('statsBar').style.display   = 'flex';
+    document.getElementById('filterRow').style.display  = 'flex';
+    document.getElementById('toolbar').style.display    = 'flex';
+
+    if (dedupCount > 0) {
+      const n = document.getElementById('dedupNotice');
+      n.textContent = `✓ ${dedupCount} duplicate entries removed — showing ${allResults.length} unique companies`;
+      n.style.display = 'block';
+    }
+
+    if (lowCount > 0) {
+      const w = document.getElementById('confNotice');
+      w.textContent = `⚠ ${lowCount} companies flagged as Low Confidence — their job postings say "or equivalent / or Workday / or similar" which means they may not own PeopleSoft. Focus on High Confidence leads first.`;
+      w.style.display = 'block';
+    }
+
+    if (!allResults.length) {
+      setStatus('No results found. Check your credentials and try again.', 'error');
+      document.getElementById('resultsGrid').innerHTML = `<div class="empty-state"><div class="empty-icon">😕</div><div class="empty-title">No results found</div><div class="empty-sub">Check your credentials and try again</div></div>`;
+    } else {
+      setStatus(`✓ Scan complete — ${allResults.length} companies found · ${highCount} high confidence PeopleSoft owners in ${location}`, 'success');
+      document.getElementById('ziTip').style.display = 'block';
+      renderCards(allResults);
+    }
+    document.getElementById('runBtn').disabled = false;
+  }
+
+  function filterByConf(level, btn) {
+    currentFilter = level;
+    document.querySelectorAll('.confidence-btn').forEach(b => b.className = 'confidence-btn');
+    const classMap = { all: 'active-all', high: 'active-high', med: 'active-med', low: 'active-low' };
+    btn.classList.add(classMap[level]);
+    const filtered = level === 'all' ? allResults : allResults.filter(r => r.confidence.level === level);
+    renderCards(filtered);
+  }
+
+  function renderCards(results) {
+    const grid = document.getElementById('resultsGrid');
+    grid.innerHTML = '';
+    if (!results.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔎</div><div class="empty-title">No results for this filter</div><div class="empty-sub">Try a different confidence level</div></div>`;
+      return;
+    }
+    results.forEach((co, i) => {
+      const card = document.createElement('div');
+      card.className = `company-card conf-${co.confidence.level}`;
+      card.style.animationDelay = `${i * 35}ms`;
+      const uniq = [...new Set(co.titles)];
+      const confLabel = { high: '✓ High Confidence', med: '~ Med Confidence', low: '⚠ Low Confidence' }[co.confidence.level];
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="company-name">${co.name}</div>
+          <div class="card-badges">
+            <div class="role-count">${co.jobCount} role${co.jobCount!==1?'s':''}</div>
+            <div class="conf-badge ${co.confidence.level}">${confLabel}</div>
+          </div>
+        </div>
+        <div class="job-title">${co.title}</div>
+        ${co.confidence.level === 'low' ? `<div class="conf-warning">⚠ ${co.confidence.reason}</div>` : ''}
+        ${uniq.length > 1 ? `
+          <button class="toggle-titles" onclick="toggleTitles(this)">▸ Show all ${uniq.length} roles</button>
+          <div class="all-titles">${uniq.map(t=>`<div class="all-titles-item">${t}</div>`).join('')}</div>
+        ` : ''}
+        <div class="card-meta">
+          ${co.location     ? `<span class="tag tag-loc">📍 ${co.location}</span>` : ''}
+          ${co.category     ? `<span class="tag tag-cat">🏷 ${co.category}</span>` : ''}
+          ${co.contractType ? `<span class="tag tag-contract">${co.contractType}</span>` : ''}
+          ${co.latestDate   ? `<span class="tag tag-date">🗓 ${daysAgo(co.latestDate)}</span>` : ''}
+        </div>
+        ${co.redirectUrl ? `<a class="view-link" href="${co.redirectUrl}" target="_blank">↗ View job posting</a>` : ''}
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function toggleTitles(btn) {
+    const c = btn.nextElementSibling;
+    const open = c.classList.toggle('open');
+    const n = btn.textContent.match(/\d+/)[0];
+    btn.textContent = open ? '▾ Hide roles' : `▸ Show all ${n} roles`;
+  }
+
+  function sortResults(by) {
+    const rank = { high: 3, med: 2, low: 1 };
+    if (by==='alpha') allResults.sort((a,b)=>a.name.localeCompare(b.name));
+    if (by==='jobs')  allResults.sort((a,b)=>b.jobCount-a.jobCount);
+    if (by==='date')  allResults.sort((a,b)=>(b.latestDate||'').localeCompare(a.latestDate||''));
+    if (by==='conf')  allResults.sort((a,b)=>rank[b.confidence.level]-rank[a.confidence.level]||b.jobCount-a.jobCount);
+    const filtered = currentFilter === 'all' ? allResults : allResults.filter(r=>r.confidence.level===currentFilter);
+    renderCards(filtered);
+  }
+
+  // ── ZoomInfo export ───────────────────────────────────────────────────────
+  function showZoomInfoModal() {
+    if (!allResults.length) { setStatus('Run a scan first to generate results.', 'error'); return; }
+    document.getElementById('ziModal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('ziModal').classList.remove('open'); }
+
+  document.getElementById('ziModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  function exportZoomInfo() {
+    // Only export High and Med confidence for ZoomInfo — skip Low
+    const exportList = allResults.filter(r => r.confidence.level !== 'low');
+    const rows = [['Company Name', 'Location', 'Industry', 'Confidence', 'Notes']];
+    exportList.forEach(co => rows.push([
+      co.name, co.location, co.category || 'IT',
+      co.confidence.level.charAt(0).toUpperCase() + co.confidence.level.slice(1),
+      `PeopleSoft hiring — ${co.jobCount} role${co.jobCount!==1?'s':''} found`
+    ]));
+    downloadCSV(rows, `Mythics_ZoomInfo_PeopleSoft_${new Date().toISOString().slice(0,10)}.csv`);
+    closeModal();
+    setStatus(`✓ ZoomInfo CSV downloaded — ${exportList.length} high/med confidence companies (${allResults.length - exportList.length} low confidence excluded)`, 'success');
+  }
+
+  function exportFullCSV() {
+    const rows = [['Company Name','Latest Job Title','All Roles','Location','Category','Contract Type','Latest Post Date','Role Count','Confidence','Confidence Reason','Keyword','Job Link']];
+    allResults.forEach(co => rows.push([
+      co.name, co.title,
+      [...new Set(co.titles)].join(' | '),
+      co.location, co.category||'', co.contractType||'',
+      formatDate(co.latestDate), co.jobCount,
+      co.confidence.level, co.confidence.reason,
+      co.keyword, co.redirectUrl||''
+    ]));
+    downloadCSV(rows, `Mythics_PeopleSoft_Discovery_${new Date().toISOString().slice(0,10)}.csv`);
+  }
+
+  function downloadCSV(rows, filename) {
+    const csv = rows.map(r => r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download = filename;
+    a.click();
+  }
+
+  function copyList() {
+    navigator.clipboard.writeText(allResults.map(c=>c.name).join('\n'))
+      .then(()=>setStatus('✓ Company names copied to clipboard', 'success'));
+  }
+</script>
+</body>
+</html>
